@@ -12,13 +12,21 @@ router = APIRouter()
 class WorkoutRequest(BaseModel):
     age: int
     weight: float
-    goal: str = "weight loss"
+    goals: str = "weight loss"
 
 @router.post("/generate-workout")
 def generate_workout(req: WorkoutRequest):
     try:
-        model = genai.GenerativeModel(os.getenv("GEMINI_WORKOUT_MODEL", "gemini-2.0-flash"))
-        prompt = f"You are FitBuddy AI. Create workout for Age {req.age}, Weight {req.weight}kg, Goal {req.goal}. Give 3 exercises with sets and reps."
+        model = genai.GenerativeModel(os.getenv("GEMINI_WORKOUT_MODEL", "gemini-1.5-flash"))
+        prompt = f"""You are FitBuddy AI. Create a workout plan for Age {req.age}, Weight {req.weight}kg, Goal {req.goals}. 
+        Give a proper Monday to Friday plan:
+        Monday - Chest + Triceps
+        Tuesday - Back + Biceps
+        Wednesday - Legs + Shoulders
+        Thursday - Core + Cardio
+        Friday - Full Body + Stretching
+        Give 3-4 exercises for each day with sets and reps.
+        """
         res = model.generate_content(prompt)
         return {"plan": res.text}
     except Exception as e:
